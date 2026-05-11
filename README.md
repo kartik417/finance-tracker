@@ -85,7 +85,7 @@ A full-stack Personal Finance Tracker application built with React, Node.js, Exp
 Swagger API Documentation available at:
 
 ```bash
-http://localhost:5000/api-docs
+https://finance-tracker-uuqc.onrender.com/api-docs/
 ```
 
 ---
@@ -95,7 +95,7 @@ http://localhost:5000/api-docs
 ## 1. Clone Repository
 
 ```bash
-git clone YOUR_GITHUB_REPO_LINK
+git clone https://github.com/kartik417/finance-tracker
 ```
 
 ---
@@ -113,7 +113,7 @@ Create `.env` file:
 PORT=5000
 DATABASE_URL=YOUR_DATABASE_URL
 JWT_SECRET=YOUR_SECRET_KEY
-REDIS_URL=redis://127.0.0.1:6379
+REDIS_URL=YOUR_REDIS_URL
 ```
 
 Run backend:
@@ -143,12 +143,12 @@ npm run dev
 
 ## User
 
-* Email: [testuser@gmail.com](mailto:user@example.com)
+* Email: [test@gmail.com](mailto:user@example.com)
 * Password: Test@123
 
 ## Read-only
 
-* Email: [readonly@gmail.com](mailto:user@example.com)
+* Email: [read@gmail.com](mailto:user@example.com)
 * Password: Read@123
 
 ---
@@ -195,9 +195,6 @@ finance-tracker/
 
 * Render
 
-## Database
-
-* PostgreSQL
 
 ---
 
