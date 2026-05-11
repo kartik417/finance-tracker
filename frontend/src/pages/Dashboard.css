@@ -1,0 +1,126 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.dashboard-page{
+
+    min-height: 100vh;
+
+    width: 100%;
+
+    background: linear-gradient(
+        135deg,
+        #667eea,
+        #764ba2
+    );
+}
+
+.dashboard-container{
+
+    width: 100%;
+
+    max-width: 1400px;
+
+    margin: auto;
+
+    padding: 40px 20px;
+}
+
+.dashboard-title{
+
+    text-align: center;
+
+    color: white;
+
+    margin-bottom: 40px;
+
+    font-size: clamp(32px,5vw,55px);
+}
+
+.cards-container{
+
+    display: grid;
+
+    grid-template-columns:
+    repeat(auto-fit,minmax(280px,1fr));
+
+    gap: 25px;
+}
+
+.card{
+
+    background: rgba(255,255,255,0.95);
+
+    padding: 35px 20px;
+
+    border-radius: 20px;
+
+    text-align: center;
+
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+
+    transition: 0.3s;
+
+    width: 100%;
+}
+
+.card:hover{
+
+    transform: translateY(-8px);
+}
+
+.card h2{
+
+    margin-bottom: 15px;
+
+    color: #333;
+
+    font-size: clamp(24px,3vw,38px);
+}
+
+.card p{
+
+    font-size: clamp(28px,4vw,45px);
+
+    font-weight: bold;
+
+    color: #555;
+}
+
+.income{
+    border-top: 6px solid #16a34a;
+}
+
+.expense{
+    border-top: 6px solid #dc2626;
+}
+
+.balance{
+    border-top: 6px solid #2563eb;
+}
+
+.transactions{
+    border-top: 6px solid #ca8a04;
+}
+
+/* MOBILE */
+
+@media(max-width:768px){
+
+    .dashboard-container{
+
+        padding: 25px 15px;
+    }
+
+    .cards-container{
+
+        grid-template-columns: 1fr;
+    }
+
+    .card{
+
+        padding: 30px 15px;
+    }
+}

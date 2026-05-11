@@ -1,0 +1,131 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body{
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.register-container{
+    height: 100vh;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background: linear-gradient(
+        135deg,
+        #667eea,
+        #764ba2
+    );
+}
+
+.register-card{
+
+    width: 400px;
+
+    background: white;
+
+    padding: 40px;
+
+    border-radius: 15px;
+
+    text-align: center;
+
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+
+    backdrop-filter: blur(10px);
+}
+
+.register-card h1{
+
+    font-size: 42px;
+
+    line-height: 1.1;
+
+    color: #333;
+
+    margin-bottom: 10px;
+}
+
+.subtitle{
+
+    color: gray;
+
+    margin-bottom: 25px;
+
+    font-size: 18px;
+}
+
+.register-card form{
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 15px;
+}
+
+.register-card input{
+
+    padding: 12px;
+
+    border-radius: 8px;
+
+    border: 1px solid #ccc;
+
+    outline: none;
+
+    font-size: 16px;
+
+    transition: 0.3s;
+}
+
+.register-card input:focus{
+
+    border-color: #667eea;
+
+    box-shadow: 0 0 8px rgba(102,126,234,0.5);
+}
+
+.register-card button{
+
+    padding: 12px;
+
+    border: none;
+
+    border-radius: 8px;
+
+    background: #667eea;
+
+    color: white;
+
+    font-size: 16px;
+
+    cursor: pointer;
+
+    transition: 0.3s;
+}
+
+.register-card button:hover{
+
+    background: #5a67d8;
+
+    transform: translateY(-2px);
+}
+
+.login-text{
+
+    margin-top: 20px;
+
+    color: gray;
+}
+
+.login-btn{
+
+    width: 100%;
+
+    margin-top: 10px;
+}
