@@ -2,36 +2,42 @@ const swaggerJsDoc = require("swagger-jsdoc");
 
 const options = {
 
-   definition: {
+    definition: {
 
-      openapi: "3.0.0",
+        openapi: "3.0.0",
 
-      info: {
+        info: {
 
-         title: "Finance Tracker API",
+            title: "Finance Tracker API",
 
-         version: "1.0.0",
+            version: "1.0.0",
 
-         description:
-            "Finance Tracker Backend API"
+            description:
+                "Finance Tracker Backend API"
 
-      },
+        },
 
-      servers: [
+        servers: [
 
-         {
-            url: "http://localhost:5000/api"
-         }
+            {
+                url: "http://localhost:5000/api",
+                description: "Local Server"
+            },
 
-      ]
+            {
+                url: "https://finance-tracker-uuqc.onrender.com/api",
+                description: "Production Server"
+            }
 
-   },
+        ]
 
-   apis: ["./routes/*.js"]
+    },
+
+    apis: ["./routes/*.js"]
 
 };
 
 const swaggerSpec =
-   swaggerJsDoc(options);
+    swaggerJsDoc(options);
 
 module.exports = swaggerSpec;
