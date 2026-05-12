@@ -8,17 +8,22 @@ const getAnalytics = async (req, res) => {
             req.user.role === "admin"
                 ? "analytics:admin"
                 : `analytics:${req.user.id}`;
-                
+
         const cachedData = await redisClient.get(cacheKey);
 
         if (cachedData) {
+            console.log(
+                `Cache HIT: ${cacheKey}`
+            );
 
             return res.status(200).json(
                 JSON.parse(cachedData)
             );
 
         }
-
+        console.log(
+            `Cache MISS: ${cacheKey}`
+        );
         const user_id = req.user.id;
         const role = req.user.role;
 

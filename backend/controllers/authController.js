@@ -13,7 +13,7 @@ const registerUser = async (req, res) => {
          [email]
       );
 
-      if(userExists.rows.length > 0){
+      if (userExists.rows.length > 0) {
          return res.status(400).json({
             message: "User already exists"
          });
@@ -29,13 +29,13 @@ const registerUser = async (req, res) => {
           RETURNING id, name, email, role`,
          [name, email, hashedPassword]
       );
-
+      console.log("New User Registered:", email);
       res.status(201).json({
          message: "User registered successfully",
          user: newUser.rows[0]
       });
 
-   } catch(error){
+   } catch (error) {
       console.log(error);
 
       res.status(500).json({
@@ -51,16 +51,27 @@ const loginUser = async (req, res) => {
 
       const { email, password } = req.body;
 
+      console.log(
+         `Login Attempt: ${email}`
+      );
+
       // check user exists
       const user = await pool.query(
          "SELECT * FROM users WHERE email = $1",
          [email]
       );
 
-      if(user.rows.length === 0){
+      // user not found
+      if (user.rows.length === 0) {
+
+         console.log(
+            `Login Failed - User Not Found: ${email}`
+         );
+
          return res.status(400).json({
             message: "Invalid credentials"
          });
+
       }
 
       // compare password
@@ -69,10 +80,17 @@ const loginUser = async (req, res) => {
          user.rows[0].password
       );
 
-      if(!validPassword){
+      // wrong password
+      if (!validPassword) {
+
+         console.log(
+            `Login Failed - Wrong Password: ${email}`
+         );
+
          return res.status(400).json({
             message: "Invalid credentials"
          });
+
       }
 
       // generate token
@@ -87,20 +105,29 @@ const loginUser = async (req, res) => {
          }
       );
 
+      console.log(
+         `Login Success: ${email} (${user.rows[0].role})`
+      );
+
       res.status(200).json({
          message: "Login successful",
          token
       });
 
-   } catch(error){
+   } catch (error) {
 
-      console.log(error);
+      console.log(
+         "Login Server Error:",
+         error.message
+      );
 
       res.status(500).json({
          message: "Server Error"
       });
+
    }
 };
+
 module.exports = {
    registerUser,
    loginUser
