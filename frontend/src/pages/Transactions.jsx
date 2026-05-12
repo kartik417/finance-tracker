@@ -4,11 +4,14 @@ import {
     useMemo,
     useCallback
 } from "react";
+import toast from "react-hot-toast";
 import Navbar from "../components/Navbar";
 import API from "../api/axios";
 import "./Transactions.css";
+
 function Transactions() {
     const role = localStorage.getItem("role");
+    const isAdmin = role === "admin";
     const [transactions, setTransactions] = useState([]);
     const [editId, setEditId] = useState(null);
     const [search, setSearch] = useState("");
@@ -89,8 +92,8 @@ function Transactions() {
 
         } catch (error) {
 
-            console.log(error);
-
+            // console.log(error);
+            toast.error("Something went wrong");
         }
     };
 
@@ -123,7 +126,7 @@ function Transactions() {
                     }
                 );
 
-                alert("Transaction Updated");
+                toast.success("Transaction updated successfully");
 
                 setEditId(null);
 
@@ -139,7 +142,7 @@ function Transactions() {
                     }
                 );
 
-                alert("Transaction Added");
+                toast.success("Transaction added successfully");
 
             }
             fetchTransactions();
@@ -152,7 +155,8 @@ function Transactions() {
 
         } catch (error) {
 
-            console.log(error);
+            // console.log(error);
+            toast.error("Something went wrong");
 
         }
     };
@@ -185,7 +189,7 @@ function Transactions() {
                 }
             );
 
-            alert("Transaction Deleted");
+            toast.success("Transaction deleted successfully");
 
             fetchTransactions();
             setFormData({
@@ -197,8 +201,8 @@ function Transactions() {
 
         } catch (error) {
 
-            console.log(error);
-
+            // console.log(error);
+            toast.error("Something went wrong");
         }
     };
 
@@ -210,9 +214,47 @@ function Transactions() {
 
             <div className="transactions-container">
 
+                {/* TITLE */}
+
                 <h1 className="transactions-title">
-                    Transactions
+
+                    {
+                        isAdmin
+                            ? "All User Transactions"
+                            : "My Transactions"
+                    }
+
                 </h1>
+
+                {/* ADMIN BANNER */}
+
+                {
+                    isAdmin && (
+
+                        <div className="admin-banner">
+
+                            <div>
+
+                                <h2>
+                                    Admin Transaction Access
+                                </h2>
+
+                                <p>
+                                    You can manage all user transactions
+                                </p>
+
+                            </div>
+
+                            <span className="admin-badge">
+                                ADMIN
+                            </span>
+
+                        </div>
+
+                    )
+                }
+
+                {/* FORM */}
 
                 {
                     role !== "read-only" && (
@@ -309,6 +351,8 @@ function Transactions() {
                     )
                 }
 
+                {/* FILTERS */}
+
                 <div className="filters">
 
                     <input
@@ -343,6 +387,8 @@ function Transactions() {
 
                 </div>
 
+                {/* TRANSACTION GRID */}
+
                 <div className="transaction-grid">
 
                     {
@@ -351,8 +397,8 @@ function Transactions() {
                             <div
                                 key={transaction.id}
                                 className={`transaction-card ${transaction.type === "income"
-                                        ? "income-card"
-                                        : "expense-card"
+                                    ? "income-card"
+                                    : "expense-card"
                                     }`}
                             >
 
@@ -360,19 +406,62 @@ function Transactions() {
                                     {transaction.title}
                                 </h3>
 
+                                {/* ADMIN USER INFO */}
+
+                                {
+                                    isAdmin && (
+
+                                        <div className="admin-user-info">
+
+                                            <p>
+
+                                                <strong>User:</strong>
+                                                {transaction.name}
+
+                                            </p>
+
+                                            <p>
+
+                                                <strong>Email:</strong>
+                                                {transaction.email}
+
+                                            </p>
+
+                                        </div>
+
+                                    )
+                                }
+
                                 <p>
+
                                     <strong>Amount:</strong>
                                     ₹ {transaction.amount}
+
                                 </p>
 
                                 <p>
+
                                     <strong>Type:</strong>
-                                    {transaction.type}
+
+                                    <span
+                                        className={
+                                            transaction.type === "income"
+                                                ? "type-badge income-badge"
+                                                : "type-badge expense-badge"
+                                        }
+                                    >
+
+                                        {transaction.type}
+
+                                    </span>
+
                                 </p>
 
                                 <p>
+
                                     <strong>Category:</strong>
                                     {transaction.category}
+
                                 </p>
 
                                 {
@@ -408,7 +497,19 @@ function Transactions() {
                         ))
                     }
 
+                    {
+                        currentTransactions.length === 0 && (
+
+                            <div className="no-data">
+                                No transactions found 🚫
+                            </div>
+
+                        )
+                    }
+
                 </div>
+
+                {/* PAGINATION */}
 
                 <div className="pagination">
 

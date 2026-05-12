@@ -20,6 +20,10 @@ const addTransaction = async (req, res) => {
       await redisClient.del(
          `analytics:${user_id}`
       );
+
+      await redisClient.del(
+         "analytics:admin"
+      );
       res.status(201).json({
          message: "Transaction added",
          transaction: newTransaction.rows[0]
@@ -44,12 +48,19 @@ const getTransactions = async (req, res) => {
 
       let transactions;
 
+
       // ADMIN => ALL DATA
-      if(role === "admin"){
+      if (role === "admin") {
 
          transactions = await pool.query(
-            `SELECT * FROM transactions
-             ORDER BY id DESC`
+            `SELECT
+         transactions.*,
+         users.name,
+         users.email
+       FROM transactions
+       JOIN users
+       ON transactions.user_id = users.id
+       ORDER BY transactions.id DESC`
          );
 
       } else {
@@ -57,8 +68,8 @@ const getTransactions = async (req, res) => {
          // USER + READ-ONLY => OWN DATA
          transactions = await pool.query(
             `SELECT * FROM transactions
-             WHERE user_id = $1
-             ORDER BY id DESC`,
+       WHERE user_id = $1
+       ORDER BY id DESC`,
             [user_id]
          );
 
@@ -68,7 +79,7 @@ const getTransactions = async (req, res) => {
          transactions: transactions.rows
       });
 
-   } catch(error){
+   } catch (error) {
 
       console.log(error);
 
@@ -78,36 +89,75 @@ const getTransactions = async (req, res) => {
 
    }
 };
+
 const updateTransaction = async (req, res) => {
 
    try {
 
       const { id } = req.params;
 
-      const { title, amount, type, category } = req.body;
+      const {
+         title,
+         amount,
+         type,
+         category
+      } = req.body;
 
       const user_id = req.user.id;
+      const role = req.user.role;
 
-      const updatedTransaction = await pool.query(
-         `UPDATE transactions
-          SET title = $1,
-              amount = $2,
-              type = $3,
-              category = $4
-          WHERE id = $5
-          AND user_id = $6
-          RETURNING *`,
-         [title, amount, type, category, id, user_id]
-      );
+      let updatedTransaction;
+
+      // ADMIN => UPDATE ANY
+      if (role === "admin") {
+
+         updatedTransaction = await pool.query(
+            `UPDATE transactions
+             SET title = $1,
+                 amount = $2,
+                 type = $3,
+                 category = $4
+             WHERE id = $5
+             RETURNING *`,
+            [title, amount, type, category, id]
+         );
+
+      } else {
+
+         // USER => ONLY OWN
+         updatedTransaction = await pool.query(
+            `UPDATE transactions
+             SET title = $1,
+                 amount = $2,
+                 type = $3,
+                 category = $4
+             WHERE id = $5
+             AND user_id = $6
+             RETURNING *`,
+            [title, amount, type, category, id, user_id]
+         );
+
+      }
 
       if (updatedTransaction.rows.length === 0) {
+
          return res.status(404).json({
             message: "Transaction not found"
          });
+
       }
+
+      const affectedUserId =
+         updatedTransaction.rows[0].user_id;
+
       await redisClient.del(
-         `analytics:${user_id}`
+         `analytics:${affectedUserId}`
       );
+
+      await redisClient.del(
+         `analytics:admin`
+      );
+
       res.status(200).json({
          message: "Transaction updated",
          transaction: updatedTransaction.rows[0]
@@ -123,6 +173,10 @@ const updateTransaction = async (req, res) => {
 
    }
 };
+
+
+
+
 const deleteTransaction = async (req, res) => {
 
    try {
@@ -130,14 +184,32 @@ const deleteTransaction = async (req, res) => {
       const { id } = req.params;
 
       const user_id = req.user.id;
+      const role = req.user.role;
 
-      const deletedTransaction = await pool.query(
-         `DELETE FROM transactions
-          WHERE id = $1
-          AND user_id = $2
-          RETURNING *`,
-         [id, user_id]
-      );
+      let deletedTransaction;
+
+      // ADMIN => DELETE ANY
+      if (role === "admin") {
+
+         deletedTransaction = await pool.query(
+            `DELETE FROM transactions
+             WHERE id = $1
+             RETURNING *`,
+            [id]
+         );
+
+      } else {
+
+         // USER => OWN ONLY
+         deletedTransaction = await pool.query(
+            `DELETE FROM transactions
+             WHERE id = $1
+             AND user_id = $2
+             RETURNING *`,
+            [id, user_id]
+         );
+
+      }
 
       if (deletedTransaction.rows.length === 0) {
 
@@ -146,9 +218,18 @@ const deleteTransaction = async (req, res) => {
          });
 
       }
+
+      const affectedUserId =
+         deletedTransaction.rows[0].user_id;
+
       await redisClient.del(
-         `analytics:${user_id}`
+         `analytics:${affectedUserId}`
       );
+
+      await redisClient.del(
+         `analytics:admin`
+      );
+
       res.status(200).json({
          message: "Transaction deleted",
          transaction: deletedTransaction.rows[0]

@@ -15,11 +15,14 @@ import {
    YAxis,
    CartesianGrid,
    LineChart,
-   Line
+   Line,
+   ResponsiveContainer
 } from "recharts";
 
 function Analytics() {
+   const role = localStorage.getItem("role");
 
+   const isAdmin = role === "admin";
    const [analytics, setAnalytics] = useState(null);
 
    useEffect(() => {
@@ -45,15 +48,26 @@ function Analytics() {
 
          setAnalytics(response.data);
 
-      } catch(error){
+      } catch (error) {
 
          console.log(error);
 
       }
    };
 
-   if(!analytics){
-      return <h1>Loading...</h1>;
+   if (!analytics) {
+
+      return (
+
+         <div className="loading-screen">
+
+            <div className="loader"></div>
+
+            <h2>Loading Analytics...</h2>
+
+         </div>
+
+      );
    }
 
    // pie chart
@@ -71,168 +85,239 @@ function Analytics() {
    // monthly chart
    const monthlyChartData =
       Object.entries(analytics.monthlyData)
-      .map(([month, values]) => ({
-         month,
-         income: values.income,
-         expense: values.expense
-      }));
+         .map(([month, values]) => ({
+            month,
+            income: values.income,
+            expense: values.expense
+         }));
 
    // category chart
    const categoryChartData =
       Object.entries(analytics.categoryData)
-      .map(([category, amount]) => ({
-         category,
-         amount
-      }));
+         .map(([category, amount]) => ({
+            category,
+            amount
+         }));
 
    const COLORS = ["#00C49F", "#FF4D4D"];
 
-  return (
+   return (
 
-   <div className="analytics-page">
+      <div className="analytics-page">
 
-      <Navbar />
+         <Navbar />
 
-      <div className="analytics-container">
+         <div className="analytics-container">
 
-         <h1 className="analytics-title">
-            Analytics Dashboard
-         </h1>
+            {/* TITLE */}
 
-         {/* PIE CHART */}
+            <h1 className="analytics-title">
 
-         <div className="chart-card">
+               {
+                  isAdmin
+                     ? "Platform Analytics"
+                     : "Analytics Dashboard"
+               }
 
-            <h2>
-               Income vs Expense
-            </h2>
+            </h1>
 
-            <div className="chart-wrapper">
+            {/* ADMIN BANNER */}
 
-               <PieChart width={400} height={400}>
+            {
+               isAdmin && (
 
-                  <Pie
-                     data={pieData}
-                     cx="50%"
-                     cy="50%"
-                     outerRadius={120}
-                     dataKey="value"
-                     label
+                  <div className="admin-banner">
+
+                     <div>
+
+                        <h2>
+                           Global Analytics Access
+                        </h2>
+
+                        <p>
+                           Viewing complete platform financial data
+                        </p>
+
+                     </div>
+
+                     <span className="admin-badge">
+                        ADMIN
+                     </span>
+
+                  </div>
+
+               )
+            }
+
+            {/* PIE CHART */}
+
+            <div className="chart-card">
+
+               <h2>
+
+                  {
+                     isAdmin
+                        ? "Platform Income vs Expense"
+                        : "Income vs Expense"
+                  }
+
+               </h2>
+
+               <div className="chart-wrapper">
+
+                  <ResponsiveContainer
+                     width="100%"
+                     height={400}
                   >
 
-                     {
-                        pieData.map((entry, index) => (
+                     <PieChart>
 
-                           <Cell
-                              key={index}
-                              fill={
-                                 COLORS[index % COLORS.length]
-                              }
-                           />
+                        <Pie
+                           data={pieData}
+                           cx="50%"
+                           cy="50%"
+                           outerRadius={120}
+                           dataKey="value"
+                           label
+                        >
 
-                        ))
-                     }
+                           {
+                              pieData.map((entry, index) => (
 
-                  </Pie>
+                                 <Cell
+                                    key={index}
+                                    fill={
+                                       COLORS[index % COLORS.length]
+                                    }
+                                 />
 
-                  <Tooltip />
+                              ))
+                           }
 
-                  <Legend />
+                        </Pie>
 
-               </PieChart>
+                        <Tooltip />
 
-            </div>
+                        <Legend />
 
-         </div>
+                     </PieChart>
 
-         {/* BAR CHART */}
+                  </ResponsiveContainer>
 
-         <div className="chart-card">
-
-            <h2>
-               Category Expenses
-            </h2>
-
-            <div className="chart-wrapper">
-
-               <BarChart
-                  width={700}
-                  height={350}
-                  data={categoryChartData}
-               >
-
-                  <CartesianGrid strokeDasharray="3 3" />
-
-                  <XAxis dataKey="category" />
-
-                  <YAxis />
-
-                  <Tooltip />
-
-                  <Legend />
-
-                  <Bar
-                     dataKey="amount"
-                     fill="#8884d8"
-                     radius={[10, 10, 0, 0]}
-                  />
-
-               </BarChart>
+               </div>
 
             </div>
 
-         </div>
+            {/* BAR CHART */}
 
-         {/* LINE CHART */}
+            <div className="chart-card">
 
-         <div className="chart-card">
+               <h2>
 
-            <h2>
-               Monthly Trends
-            </h2>
+                  {
+                     isAdmin
+                        ? "Platform Expense Categories"
+                        : "Category Expenses"
+                  }
 
-            <div className="chart-wrapper">
+               </h2>
 
-               <LineChart
-                  width={800}
-                  height={350}
-                  data={monthlyChartData}
-               >
+               <div className="chart-wrapper">
 
-                  <CartesianGrid strokeDasharray="3 3" />
+                  <ResponsiveContainer
+                     width="100%"
+                     height={350}
+                  >
 
-                  <XAxis dataKey="month" />
+                     <BarChart
+                        data={categoryChartData}
+                     >
 
-                  <YAxis />
+                        <CartesianGrid strokeDasharray="3 3" />
 
-                  <Tooltip />
+                        <XAxis dataKey="category" />
 
-                  <Legend />
+                        <YAxis />
 
-                  <Line
-                     type="monotone"
-                     dataKey="income"
-                     stroke="#00C49F"
-                     strokeWidth={3}
-                  />
+                        <Tooltip />
 
-                  <Line
-                     type="monotone"
-                     dataKey="expense"
-                     stroke="#FF4D4D"
-                     strokeWidth={3}
-                  />
+                        <Legend />
 
-               </LineChart>
+                        <Bar
+                           dataKey="amount"
+                           fill="#8884d8"
+                           radius={[10, 10, 0, 0]}
+                        />
+
+                     </BarChart>
+
+                  </ResponsiveContainer>
+
+               </div>
+
+            </div>
+
+            {/* LINE CHART */}
+
+            <div className="chart-card">
+
+               <h2>
+
+                  {
+                     isAdmin
+                        ? "Platform Monthly Trends"
+                        : "Monthly Trends"
+                  }
+
+               </h2>
+
+               <div className="chart-wrapper">
+
+                  <ResponsiveContainer
+                     width="100%"
+                     height={350}
+                  >
+
+                     <LineChart
+                        data={monthlyChartData}
+                     >
+
+                        <CartesianGrid strokeDasharray="3 3" />
+
+                        <XAxis dataKey="month" />
+
+                        <YAxis />
+
+                        <Tooltip />
+
+                        <Legend />
+
+                        <Line
+                           type="monotone"
+                           dataKey="income"
+                           stroke="#00C49F"
+                           strokeWidth={3}
+                        />
+
+                        <Line
+                           type="monotone"
+                           dataKey="expense"
+                           stroke="#FF4D4D"
+                           strokeWidth={3}
+                        />
+
+                     </LineChart>
+
+                  </ResponsiveContainer>
+
+               </div>
 
             </div>
 
          </div>
 
       </div>
-
-   </div>
-);
+   );
 }
 
 export default Analytics;

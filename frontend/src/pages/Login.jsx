@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import API from "../api/axios";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 import "./Login.css";
 
 function Login() {
@@ -13,12 +14,15 @@ function Login() {
 
     const [loading, setLoading] = useState(false);
 
+    const [showPassword, setShowPassword] = useState(false);
+
+    const [message, setMessage] = useState("");
+    const [errorMsg, setErrorMsg] = useState("");
     const [formData, setFormData] = useState({
         email: "",
         password: ""
     });
 
-    // page load pe email input focus
     useEffect(() => {
         emailRef.current.focus();
     }, []);
@@ -32,11 +36,15 @@ function Login() {
 
     };
 
+
     const handleSubmit = async (e) => {
 
         e.preventDefault();
 
         setLoading(true);
+
+        setMessage("");
+        setErrorMsg("");
 
         try {
 
@@ -54,17 +62,23 @@ function Login() {
                 payload.role
             );
 
-            alert(response.data.message);
+            setMessage("Login Successful 🚀");
 
-            navigate("/dashboard");
+            setTimeout(() => {
+                navigate("/dashboard");
+            }, 1200);
 
         } catch (error) {
 
             console.log(error);
 
-            alert("Login failed");
+            setErrorMsg(
+                error.response?.data?.message ||
+                "Login failed"
+            );
 
         } finally {
+
             setLoading(false);
         }
     };
@@ -73,53 +87,103 @@ function Login() {
 
         <div className="login-container">
 
+            <div className="bg-circle circle1"></div>
+            <div className="bg-circle circle2"></div>
+
             <div className="login-card">
 
-                <h1>Welcome Back</h1>
+                <div className="logo-box">
+                    💰
+                </div>
+
+                <h1>Expense Tracker</h1>
+
                 <p className="subtitle">
-                    Login to continue
+                    Manage your finances smarter
                 </p>
 
                 <form onSubmit={handleSubmit}>
 
-                    <input
-                        ref={emailRef}
-                        type="email"
-                        name="email"
-                        placeholder="Enter Email"
-                        onChange={handleChange}
-                        required
-                    />
+                    <div className="input-group">
 
-                    <input
-                        type="password"
-                        name="password"
-                        placeholder="Enter Password"
-                        onChange={handleChange}
-                        required
-                    />
+                        <input
+                            ref={emailRef}
+                            type="email"
+                            name="email"
+                            placeholder="Enter Email"
+                            onChange={handleChange}
+                            required
+                        />
 
-                    <button type="submit">
+                    </div>
+
+                    <div className="input-group password-group">
+
+                        <input
+                            type={showPassword ? "text" : "password"}
+                            name="password"
+                            placeholder="Enter Password"
+                            onChange={handleChange}
+                            required
+                        />
+
+                        <span
+                            className="eye-icon"
+                            onClick={() =>
+                                setShowPassword(!showPassword)
+                            }
+                        >
+                            {
+                                showPassword
+                                    ? <FaEyeSlash />
+                                    : <FaEye />
+                            }
+                        </span>
+
+                    </div>
+                    <button
+                        type="submit"
+                        className="login-btn"
+                        disabled={loading}
+                    >
 
                         {
                             loading
-                                ? "Logging in..."
+                                ? "Please wait..."
                                 : "Login"
                         }
 
                     </button>
 
                 </form>
+                {
+                    message && (
+                        <p className="success-msg">
+                            {message}
+                        </p>
+                    )
+                }
+
+                {
+                    errorMsg && (
+                        <p className="error-msg">
+                            {errorMsg}
+                        </p>
+                    )
+                }
+                <div className="divider">
+                    <span>OR</span>
+                </div>
 
                 <p className="register-text">
-                    Don't have an account?
+                    Don’t have an account?
                 </p>
 
                 <button
                     className="register-btn"
                     onClick={() => navigate("/register")}
                 >
-                    Register
+                    Create Account
                 </button>
 
             </div>
