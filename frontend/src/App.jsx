@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import { lazy, Suspense } from "react";
-
+import "./App.css";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 const Login = lazy(() => import("./pages/Login"));
@@ -16,7 +16,19 @@ function App() {
 
     <BrowserRouter>
 
-      <Suspense fallback={<h1>Loading...</h1>}>
+      <Suspense
+   fallback={
+      <div className="app-loader">
+
+         <div className="loader-ring"></div>
+
+         <h2>Loading Dashboard...</h2>
+
+         <p>Please wait a moment</p>
+
+      </div>
+   }
+>
 
         <Routes>
 
