@@ -35,8 +35,6 @@ function Login() {
         });
 
     };
-
-
     const handleSubmit = async (e) => {
 
         e.preventDefault();
@@ -70,14 +68,15 @@ function Login() {
 
         } catch (error) {
 
-            console.log(error);
-
             setErrorMsg(
                 error.response?.data?.message ||
                 "Login failed"
             );
 
-        } finally {
+            setLoading(false);
+        }
+
+        finally {
 
             setLoading(false);
         }

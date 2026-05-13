@@ -24,8 +24,10 @@ app.use(helmet());
 const authLimiter = rateLimit({
   windowMs: 1 * 60 * 1000,
   max: 5,
-  message:
-    "Too many login attempts. Please try again after 1 minute."
+  message: {
+    message:
+      "Too many login attempts. Please try again after 1 minute."
+  }
 });
 
 const transactionLimiter = rateLimit({
