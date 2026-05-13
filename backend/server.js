@@ -59,6 +59,12 @@ app.use(
   swaggerUi.serve,
   swaggerUi.setup(swaggerSpec)
 );
+app.get("/api/health", (req, res) => {
+   res.status(200).json({
+      success: true,
+      message: "Server running"
+   });
+});
 app.get("/", async (req, res) => {
   try {
     const result = await pool.query("SELECT NOW()");
