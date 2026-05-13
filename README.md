@@ -1,6 +1,6 @@
 # Personal Finance Tracker
 
-A full-stack Personal Finance Tracker application built with React, Node.js, Express, PostgreSQL, and Redis.
+A production-ready full-stack finance tracking application with RBAC, analytics, Redis caching, and secure JWT authentication.
 
 ---
 
@@ -49,6 +49,11 @@ A full-stack Personal Finance Tracker application built with React, Node.js, Exp
 * Pagination
 * Optimized Rendering using React Hooks
 
+## Admin Features
+
+* Access all platform analytics
+* View all user transactions
+* Manage complete transaction records
 ---
 
 # Tech Stack
@@ -95,7 +100,7 @@ https://finance-tracker-uuqc.onrender.com/api-docs/
 ## 1. Clone Repository
 
 ```bash
-git clone https://github.com/kartik417/finance-tracker
+git clone https://github.com/kartik417/finance-tracker.git
 ```
 
 ---
@@ -184,17 +189,52 @@ finance-tracker/
 * API Rate Limiting
 
 ---
+# Performance Metrics
+
+## Redis Cache Performance
+
+Analytics APIs use Redis caching for faster response times.
+
+### Cache Duration
+
+* Analytics Data → 15 Minutes
+* Category Lists → 1 Hour
+
+### Cache Monitoring
+
+Server logs display:
+
+* Cache HIT
+* Cache MISS
+
+This reduces database queries and improves API performance.
 
 # Deployment
 
 ## Frontend
-
-* Vercel
+Deployed on Vercel
 
 ## Backend
+Deployed on Render
 
-* Render
+## Database
+PostgreSQL (Neon)
 
+## Cache
+Redis Cloud
+
+---
+
+# Live Demo
+
+Frontend:
+https://finance-tracker-three-jet.vercel.app
+
+Backend API:
+https://finance-tracker-uuqc.onrender.com
+
+Swagger Docs:
+https://finance-tracker-uuqc.onrender.com/api-docs/
 
 ---
 
