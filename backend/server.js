@@ -22,9 +22,10 @@ app.use(express.json());
 app.use(helmet());
 
 const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
+  windowMs: 1 * 60 * 1000,
   max: 5,
-  message: "Too many auth requests"
+  message:
+    "Too many login attempts. Please try again after 1 minute."
 });
 
 const transactionLimiter = rateLimit({
@@ -59,12 +60,6 @@ app.use(
   swaggerUi.serve,
   swaggerUi.setup(swaggerSpec)
 );
-app.get("/api/health", (req, res) => {
-   res.status(200).json({
-      success: true,
-      message: "Server running"
-   });
-});
 app.get("/", async (req, res) => {
   try {
     const result = await pool.query("SELECT NOW()");
