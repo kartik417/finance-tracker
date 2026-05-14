@@ -236,8 +236,11 @@ https://finance-tracker-uuqc.onrender.com
 Swagger Docs:
 https://finance-tracker-uuqc.onrender.com/api-docs/
 
+Health Check:
+https://finance-tracker-uuqc.onrender.com/api/health
+
 ---
 
-# Author
+# Author    
 
 Kartik
