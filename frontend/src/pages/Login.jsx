@@ -60,7 +60,7 @@ function Login() {
                 payload.role
             );
 
-            setMessage("Login Successful 🚀");
+            setMessage("Login Successful");
 
             setTimeout(() => {
                 navigate("/dashboard");

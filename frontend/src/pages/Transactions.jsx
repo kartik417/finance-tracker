@@ -113,7 +113,28 @@ function Transactions() {
         try {
 
             const token = localStorage.getItem("token");
+            if (
+                !formData.title.trim() ||
+                !formData.amount ||
+                !formData.type ||
+                !formData.category
+            ) {
+                toast.error("All fields are required");
+                setLoading(false);
+                return;
+            }
 
+            if (formData.amount <= 0) {
+                toast.error("Amount must be greater than 0");
+                setLoading(false);
+                return;
+            }
+
+            if (formData.title.trim().length < 3) {
+                toast.error("Title must be at least 3 characters");
+                setLoading(false);
+                return;
+            }
             if (editId) {
 
                 await API.put(
