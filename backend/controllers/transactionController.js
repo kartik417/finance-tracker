@@ -17,12 +17,70 @@ const addTransaction = async (req, res) => {
          [title, amount, type, category, user_id]
       );
 
+      // await redisClient.del(
+      //    `analytics:${user_id}`
+      // );
+
+      // await redisClient.del(
+      //    "analytics:admin"
+      // );
+
+      const addedTransaction =
+         newTransaction.rows[0];
+
+      const transactionDate =
+         new Date(
+            addedTransaction.created_at
+         );
+
+      const transactionMonth =
+         transactionDate.getMonth() + 1;
+
+      const transactionYear =
+         transactionDate.getFullYear();
+
+
+      // Delete user's month-specific cache
+
+      await redisClient.del(
+         `analytics:${user_id}:${transactionYear}:${transactionMonth}`
+      );
+
+
+      // Delete admin's month-specific cache
+
+      await redisClient.del(
+         `analytics:admin:${transactionYear}:${transactionMonth}`
+      );
+
+
+      // Also delete all-time caches
+
       await redisClient.del(
          `analytics:${user_id}`
       );
 
       await redisClient.del(
          "analytics:admin"
+      );
+
+
+      const userCacheKey =
+         `analytics:${user_id}:${transactionYear}:${transactionMonth}`;
+
+      console.log(
+         "Deleting Redis cache:",
+         userCacheKey
+      );
+
+      const deletedCount =
+         await redisClient.del(
+            userCacheKey
+         );
+
+      console.log(
+         "Redis keys deleted:",
+         deletedCount
       );
       res.status(201).json({
          message: "Transaction added",
@@ -39,40 +97,124 @@ const addTransaction = async (req, res) => {
 
    }
 };
+
+// const getTransactions = async (req, res) => {
+
+//    try {
+
+//       const user_id = req.user.id;
+//       const role = req.user.role;
+
+//       let transactions;
+
+
+//       // ADMIN => ALL DATA
+//       if (role === "admin") {
+
+//          transactions = await pool.query(
+//             `SELECT
+//          transactions.*,
+//          users.name,
+//          users.email
+//        FROM transactions
+//        JOIN users
+//        ON transactions.user_id = users.id
+//        ORDER BY transactions.id DESC`
+//          );
+
+//       } else {
+
+//          // USER + READ-ONLY => OWN DATA
+//          transactions = await pool.query(
+//             `SELECT * FROM transactions
+//        WHERE user_id = $1
+//        ORDER BY id DESC`,
+//             [user_id]
+//          );
+
+//       }
+
+//       res.status(200).json({
+//          transactions: transactions.rows
+//       });
+
+//    } catch (error) {
+
+//       console.log(error);
+
+//       res.status(500).json({
+//          message: "Server Error"
+//       });
+
+//    }
+// };
+
 const getTransactions = async (req, res) => {
-
    try {
-
       const user_id = req.user.id;
       const role = req.user.role;
 
+      // Example:
+      // /api/transactions?month=6&year=2026
+      const { month, year } = req.query;
+
       let transactions;
 
+      // If month and year are provided
+      const hasDateFilter = month && year;
 
-      // ADMIN => ALL DATA
       if (role === "admin") {
 
-         transactions = await pool.query(
-            `SELECT
-         transactions.*,
-         users.name,
-         users.email
-       FROM transactions
-       JOIN users
-       ON transactions.user_id = users.id
-       ORDER BY transactions.id DESC`
-         );
+         // ADMIN => ALL DATA
+         if (hasDateFilter) {
+            transactions = await pool.query(
+               `SELECT
+                  transactions.*,
+                  users.name,
+                  users.email
+                FROM transactions
+                JOIN users
+                  ON transactions.user_id = users.id
+                WHERE EXTRACT(MONTH FROM transactions.created_at) = $1
+                  AND EXTRACT(YEAR FROM transactions.created_at) = $2
+                ORDER BY transactions.created_at DESC`,
+               [month, year]
+            );
+         } else {
+            transactions = await pool.query(
+               `SELECT
+                  transactions.*,
+                  users.name,
+                  users.email
+                FROM transactions
+                JOIN users
+                  ON transactions.user_id = users.id
+                ORDER BY transactions.created_at DESC`
+            );
+         }
 
       } else {
 
          // USER + READ-ONLY => OWN DATA
-         transactions = await pool.query(
-            `SELECT * FROM transactions
-       WHERE user_id = $1
-       ORDER BY id DESC`,
-            [user_id]
-         );
-
+         if (hasDateFilter) {
+            transactions = await pool.query(
+               `SELECT *
+                FROM transactions
+                WHERE user_id = $1
+                  AND EXTRACT(MONTH FROM created_at) = $2
+                  AND EXTRACT(YEAR FROM created_at) = $3
+                ORDER BY created_at DESC`,
+               [user_id, month, year]
+            );
+         } else {
+            transactions = await pool.query(
+               `SELECT *
+                FROM transactions
+                WHERE user_id = $1
+                ORDER BY created_at DESC`,
+               [user_id]
+            );
+         }
       }
 
       res.status(200).json({
@@ -80,13 +222,11 @@ const getTransactions = async (req, res) => {
       });
 
    } catch (error) {
-
       console.log(error);
 
       res.status(500).json({
          message: "Server Error"
       });
-
    }
 };
 
@@ -147,15 +287,57 @@ const updateTransaction = async (req, res) => {
 
       }
 
+
+      // const affectedUserId =
+      //    updatedTransaction.rows[0].user_id;
+
+      // await redisClient.del(
+      //    `analytics:${affectedUserId}`
+      // );
+
+      // await redisClient.del(
+      //    `analytics:admin`
+      // );
+
+      const transaction =
+         updatedTransaction.rows[0];
+
+
       const affectedUserId =
-         updatedTransaction.rows[0].user_id;
+         transaction.user_id;
+
+
+      const transactionDate =
+         new Date(
+            transaction.created_at
+         );
+
+
+      const transactionMonth =
+         transactionDate.getMonth() + 1;
+
+
+      const transactionYear =
+         transactionDate.getFullYear();
+
+
+      await redisClient.del(
+         `analytics:${affectedUserId}:${transactionYear}:${transactionMonth}`
+      );
+
+
+      await redisClient.del(
+         `analytics:admin:${transactionYear}:${transactionMonth}`
+      );
+
 
       await redisClient.del(
          `analytics:${affectedUserId}`
       );
 
+
       await redisClient.del(
-         `analytics:admin`
+         "analytics:admin"
       );
 
       res.status(200).json({
@@ -219,15 +401,56 @@ const deleteTransaction = async (req, res) => {
 
       }
 
+      // const affectedUserId =
+      //    deletedTransaction.rows[0].user_id;
+
+      // await redisClient.del(
+      //    `analytics:${affectedUserId}`
+      // );
+
+      // await redisClient.del(
+      //    `analytics:admin`
+      // );
+
+      const transaction =
+         deletedTransaction.rows[0];
+
+
       const affectedUserId =
-         deletedTransaction.rows[0].user_id;
+         transaction.user_id;
+
+
+      const transactionDate =
+         new Date(
+            transaction.created_at
+         );
+
+
+      const transactionMonth =
+         transactionDate.getMonth() + 1;
+
+
+      const transactionYear =
+         transactionDate.getFullYear();
+
+
+      await redisClient.del(
+         `analytics:${affectedUserId}:${transactionYear}:${transactionMonth}`
+      );
+
+
+      await redisClient.del(
+         `analytics:admin:${transactionYear}:${transactionMonth}`
+      );
+
 
       await redisClient.del(
          `analytics:${affectedUserId}`
       );
 
+
       await redisClient.del(
-         `analytics:admin`
+         "analytics:admin"
       );
 
       res.status(200).json({

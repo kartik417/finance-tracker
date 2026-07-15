@@ -9,7 +9,9 @@ const Register = lazy(() => import("./pages/Register"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Transactions = lazy(() => import("./pages/Transactions"));
 const Analytics = lazy(() => import("./pages/Analytics"));
-
+const AIAssistant = lazy(
+  () => import("./pages/AIAssistant")
+);
 function App() {
 
   return (
@@ -17,18 +19,18 @@ function App() {
     <BrowserRouter>
 
       <Suspense
-   fallback={
-      <div className="app-loader">
+        fallback={
+          <div className="app-loader">
 
-         <div className="loader-ring"></div>
+            <div className="loader-ring"></div>
 
-         <h2>Loading Dashboard...</h2>
+            <h2>Loading Dashboard...</h2>
 
-         <p>Please wait a moment</p>
+            <p>Please wait a moment</p>
 
-      </div>
-   }
->
+          </div>
+        }
+      >
 
         <Routes>
 
@@ -59,6 +61,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Analytics />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/ai-assistant"
+            element={
+              <ProtectedRoute>
+                <AIAssistant />
               </ProtectedRoute>
             }
           />

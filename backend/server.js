@@ -14,6 +14,7 @@ const swaggerUi =
 const swaggerSpec =
   require("./config/swagger");
 dotenv.config();
+const aiRoutes = require("./routes/aiRoutes");
 
 const app = express();
 
@@ -41,7 +42,15 @@ const analyticsLimiter = rateLimit({
   max: 50,
   message: "Too many analytics requests"
 });
+const aiLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 30,
+  message: {
+    message: "Too many AI requests. Please try again later."
+  }
+});
 app.use("/api/auth", authLimiter, authRoutes);
+
 
 app.use(
   "/api/transactions",
@@ -55,6 +64,7 @@ app.use(
   analyticsRoutes
 );
 
+app.use("/api/ai", aiLimiter, aiRoutes);
 
 app.use("/api/users", userRoutes);
 app.use(

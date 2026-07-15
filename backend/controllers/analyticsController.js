@@ -4,76 +4,155 @@ const redisClient = require("../config/redis");
 const getAnalytics = async (req, res) => {
 
     try {
-        const cacheKey =
-            req.user.role === "admin"
-                ? "analytics:admin"
-                : `analytics:${req.user.id}`;
 
+        const user_id = req.user.id;
+        const role = req.user.role;
+
+        // Get selected month and year from frontend
+        const { month, year } = req.query;
+
+        console.log("Selected Month:", month);
+        console.log("Selected Year:", year);
+
+        const hasDateFilter = month && year;
+
+        // Different cache for every month
+        const cacheKey =
+            role === "admin"
+                ? hasDateFilter
+                    ? `analytics:admin:${year}:${month}`
+                    : "analytics:admin"
+                : hasDateFilter
+                    ? `analytics:${user_id}:${year}:${month}`
+                    : `analytics:${user_id}`;
+
+        // Check Redis cache
         const cachedData = await redisClient.get(cacheKey);
 
         if (cachedData) {
-            console.log(
-                `Cache HIT: ${cacheKey}`
-            );
+
+            console.log(`Cache HIT: ${cacheKey}`);
 
             return res.status(200).json(
                 JSON.parse(cachedData)
             );
-
         }
-        console.log(
-            `Cache MISS: ${cacheKey}`
-        );
-        const user_id = req.user.id;
-        const role = req.user.role;
+
+        console.log(`Cache MISS: ${cacheKey}`);
 
         let transactions;
 
-        // admin => all transactions
+
+        // =========================
+        // ADMIN
+        // =========================
+
         if (role === "admin") {
 
-            transactions = await pool.query(
-                `SELECT * FROM transactions
-             ORDER BY created_at DESC`
-            );
+            if (hasDateFilter) {
 
-        } else {
+                transactions = await pool.query(
+                    `SELECT *
+                     FROM transactions
+                     WHERE EXTRACT(MONTH FROM created_at) = $1
+                     AND EXTRACT(YEAR FROM created_at) = $2
+                     ORDER BY created_at DESC`,
+                    [month, year]
+                );
 
-            transactions = await pool.query(
-                `SELECT * FROM transactions
-             WHERE user_id = $1
-             ORDER BY created_at DESC`,
-                [user_id]
-            );
+            } else {
+
+                transactions = await pool.query(
+                    `SELECT *
+                     FROM transactions
+                     ORDER BY created_at DESC`
+                );
+
+            }
 
         }
 
+
+        // =========================
+        // NORMAL USER
+        // =========================
+
+        else {
+
+            if (hasDateFilter) {
+
+                transactions = await pool.query(
+                    `SELECT *
+                     FROM transactions
+                     WHERE user_id = $1
+                     AND EXTRACT(MONTH FROM created_at) = $2
+                     AND EXTRACT(YEAR FROM created_at) = $3
+                     ORDER BY created_at DESC`,
+                    [user_id, month, year]
+                );
+
+            } else {
+
+                transactions = await pool.query(
+                    `SELECT *
+                     FROM transactions
+                     WHERE user_id = $1
+                     ORDER BY created_at DESC`,
+                    [user_id]
+                );
+
+            }
+
+        }
+
+
         const data = transactions.rows;
 
-        // totals
+
+        // =========================
+        // TOTALS
+        // =========================
+
         const totalIncome = data
             .filter((t) => t.type === "income")
-            .reduce((acc, curr) => acc + Number(curr.amount), 0);
+            .reduce(
+                (acc, curr) =>
+                    acc + Number(curr.amount),
+                0
+            );
 
         const totalExpense = data
             .filter((t) => t.type === "expense")
-            .reduce((acc, curr) => acc + Number(curr.amount), 0);
-        const balance = totalIncome - totalExpense;
+            .reduce(
+                (acc, curr) =>
+                    acc + Number(curr.amount),
+                0
+            );
 
-        const totalTransactions = data.length;
-        // monthly data
+        const balance =
+            totalIncome - totalExpense;
+
+        const totalTransactions =
+            data.length;
+
+
+        // =========================
+        // MONTHLY DATA
+        // =========================
+
         const monthlyData = {};
 
         data.forEach((transaction) => {
 
-            const date = new Date(transaction.created_at);
+            const date =
+                new Date(transaction.created_at);
 
-            const month =
+            const monthKey =
                 `${date.getMonth() + 1}-${date.getFullYear()}`;
 
-            if (!monthlyData[month]) {
+            if (!monthlyData[monthKey]) {
 
-                monthlyData[month] = {
+                monthlyData[monthKey] = {
                     income: 0,
                     expense: 0
                 };
@@ -82,17 +161,23 @@ const getAnalytics = async (req, res) => {
 
             if (transaction.type === "income") {
 
-                monthlyData[month].income += Number(transaction.amount);
+                monthlyData[monthKey].income +=
+                    Number(transaction.amount);
 
             } else {
 
-                monthlyData[month].expense += Number(transaction.amount);
+                monthlyData[monthKey].expense +=
+                    Number(transaction.amount);
 
             }
 
         });
 
-        // category breakdown
+
+        // =========================
+        // CATEGORY DATA
+        // =========================
+
         const categoryData = {};
 
         data.forEach((transaction) => {
@@ -112,27 +197,32 @@ const getAnalytics = async (req, res) => {
 
         });
 
-        await redisClient.setEx(
-            cacheKey,
-            900,
-            JSON.stringify({
-                totalIncome,
-                totalExpense,
-                balance: totalIncome - totalExpense,
-                totalTransactions: data.length,
-                monthlyData,
-                categoryData
-            })
-        );
 
-        res.status(200).json({
+        // Final analytics object
+        const analyticsData = {
+
             totalIncome,
             totalExpense,
             balance,
             totalTransactions,
             monthlyData,
             categoryData
-        });
+
+        };
+
+
+        // Save month-specific data in Redis
+        await redisClient.setEx(
+            cacheKey,
+            900,
+            JSON.stringify(analyticsData)
+        );
+
+
+        res.status(200).json(
+            analyticsData
+        );
+
 
     } catch (error) {
 
@@ -143,7 +233,9 @@ const getAnalytics = async (req, res) => {
         });
 
     }
+
 };
+
 
 module.exports = {
     getAnalytics

@@ -26,17 +26,29 @@ function Transactions() {
 
     const transactionsPerPage = 5;
 
+    const currentDate = new Date();
+
+    const [month, setMonth] = useState(
+        currentDate.getMonth() + 1
+    );
+
+    const [year, setYear] = useState(
+        currentDate.getFullYear()
+    );
+
+    const [loading, setLoading] = useState(true);
+
     useEffect(() => {
 
         fetchTransactions();
 
-    }, []);
+    }, [month, year]);
 
     useEffect(() => {
 
         setCurrentPage(1);
 
-    }, [search, filterType]);
+    }, [search, filterType, month, year]);
 
     const filteredTransactions = useMemo(() => {
 
@@ -75,12 +87,14 @@ function Transactions() {
     );
     const fetchTransactions = async () => {
 
+        setLoading(true);
+
         try {
 
             const token = localStorage.getItem("token");
 
             const response = await API.get(
-                "/transactions/all",
+                `/transactions/all?month=${month}&year=${year}`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`
@@ -88,12 +102,20 @@ function Transactions() {
                 }
             );
 
-            setTransactions(response.data.transactions);
+            setTransactions(
+                response.data.transactions
+            );
 
         } catch (error) {
 
-            // console.log(error);
-            toast.error("Something went wrong");
+            toast.error(
+                "Something went wrong"
+            );
+
+        } finally {
+
+            setLoading(false);
+
         }
     };
 
@@ -391,7 +413,6 @@ function Transactions() {
                             setFilterType(e.target.value)
                         }
                     >
-
                         <option value="all">
                             All
                         </option>
@@ -403,133 +424,162 @@ function Transactions() {
                         <option value="expense">
                             Expense
                         </option>
+                    </select>
 
+
+                    {/* MONTH FILTER */}
+
+                    <select
+                        value={month}
+                        disabled={loading}
+                        onChange={(e) =>
+                            setMonth(Number(e.target.value))
+                        }
+                    >
+                        <option value={1}>January</option>
+                        <option value={2}>February</option>
+                        <option value={3}>March</option>
+                        <option value={4}>April</option>
+                        <option value={5}>May</option>
+                        <option value={6}>June</option>
+                        <option value={7}>July</option>
+                        <option value={8}>August</option>
+                        <option value={9}>September</option>
+                        <option value={10}>October</option>
+                        <option value={11}>November</option>
+                        <option value={12}>December</option>
+                    </select>
+
+
+                    {/* YEAR FILTER */}
+
+                    <select
+                        value={year}
+                        disabled={loading}
+                        onChange={(e) =>
+                            setYear(Number(e.target.value))
+                        }
+                    >
+                        <option value={2025}>2025</option>
+                        <option value={2026}>2026</option>
                     </select>
 
                 </div>
 
                 {/* TRANSACTION GRID */}
 
+
                 <div className="transaction-grid">
 
                     {
-                        currentTransactions.map((transaction) => (
+                        loading
+                            ? (
+                                <div className="no-data">
+                                    <p>Loading transactions...</p>
+                                </div>
+                            )
+                            : currentTransactions.length > 0
+                                ? (
+                                    currentTransactions.map((transaction) => (
 
-                            <div
-                                key={transaction.id}
-                                className={`transaction-card ${transaction.type === "income"
-                                    ? "income-card"
-                                    : "expense-card"
-                                    }`}
-                            >
+                                        <div
+                                            key={transaction.id}
+                                            className={`transaction-card ${transaction.type === "income"
+                                                    ? "income-card"
+                                                    : "expense-card"
+                                                }`}
+                                        >
 
-                                <h3>
-                                    {transaction.title}
-                                </h3>
+                                            <h3>
+                                                {transaction.title}
+                                            </h3>
 
-                                {/* ADMIN USER INFO */}
+                                            {/* ADMIN USER INFO */}
 
-                                {
-                                    isAdmin && (
+                                            {
+                                                isAdmin && (
 
-                                        <div className="admin-user-info">
+                                                    <div className="admin-user-info">
+
+                                                        <p>
+                                                            <strong>User:</strong>
+                                                            {transaction.name}
+                                                        </p>
+
+                                                        <p>
+                                                            <strong>Email:</strong>
+                                                            {transaction.email}
+                                                        </p>
+
+                                                    </div>
+
+                                                )
+                                            }
 
                                             <p>
-
-                                                <strong>User:</strong>
-                                                {transaction.name}
-
+                                                <strong>Amount:</strong>
+                                                ₹ {transaction.amount}
                                             </p>
 
                                             <p>
+                                                <strong>Type:</strong>
 
-                                                <strong>Email:</strong>
-                                                {transaction.email}
-
+                                                <span
+                                                    className={
+                                                        transaction.type === "income"
+                                                            ? "type-badge income-badge"
+                                                            : "type-badge expense-badge"
+                                                    }
+                                                >
+                                                    {transaction.type}
+                                                </span>
                                             </p>
 
-                                        </div>
+                                            <p>
+                                                <strong>Category:</strong>
+                                                {transaction.category}
+                                            </p>
 
-                                    )
-                                }
+                                            {
+                                                role !== "read-only" && (
 
-                                <p>
+                                                    <div className="card-buttons">
 
-                                    <strong>Amount:</strong>
-                                    ₹ {transaction.amount}
+                                                        <button
+                                                            className="edit-btn"
+                                                            onClick={() =>
+                                                                handleEdit(transaction)
+                                                            }
+                                                        >
+                                                            Edit
+                                                        </button>
 
-                                </p>
+                                                        <button
+                                                            className="delete-btn"
+                                                            onClick={() =>
+                                                                handleDelete(transaction.id)
+                                                            }
+                                                        >
+                                                            Delete
+                                                        </button>
 
-                                <p>
+                                                    </div>
 
-                                    <strong>Type:</strong>
-
-                                    <span
-                                        className={
-                                            transaction.type === "income"
-                                                ? "type-badge income-badge"
-                                                : "type-badge expense-badge"
-                                        }
-                                    >
-
-                                        {transaction.type}
-
-                                    </span>
-
-                                </p>
-
-                                <p>
-
-                                    <strong>Category:</strong>
-                                    {transaction.category}
-
-                                </p>
-
-                                {
-                                    role !== "read-only" && (
-
-                                        <div className="card-buttons">
-
-                                            <button
-                                                className="edit-btn"
-                                                onClick={() =>
-                                                    handleEdit(transaction)
-                                                }
-                                            >
-                                                Edit
-                                            </button>
-
-                                            <button
-                                                className="delete-btn"
-                                                onClick={() =>
-                                                    handleDelete(transaction.id)
-                                                }
-                                            >
-                                                Delete
-                                            </button>
+                                                )
+                                            }
 
                                         </div>
 
-                                    )
-                                }
-
-                            </div>
-
-                        ))
-                    }
-
-                    {
-                        currentTransactions.length === 0 && (
-
-                            <div className="no-data">
-                                No transactions found 🚫
-                            </div>
-
-                        )
+                                    ))
+                                )
+                                : (
+                                    <div className="no-data">
+                                        No transactions found for this month 🚫
+                                    </div>
+                                )
                     }
 
                 </div>
-
                 {/* PAGINATION */}
 
                 <div className="pagination">

@@ -38,6 +38,12 @@ function Navbar() {
             <Link to="/analytics">
                Analytics
             </Link>
+            <Link
+               to="/ai-assistant"
+               className="ai-nav-link"
+            >
+               ✨ AI Assistant
+            </Link>
 
          </div>
 

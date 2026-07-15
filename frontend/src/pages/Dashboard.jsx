@@ -27,6 +27,18 @@ function Dashboard() {
 
    const [loading, setLoading] = useState(true);
 
+   // fetch analytics on component mount
+
+   const currentDate = new Date();
+
+   const [month, setMonth] = useState(
+      currentDate.getMonth() + 1
+   );
+
+   const [year, setYear] = useState(
+      currentDate.getFullYear()
+   );
+
    useEffect(() => {
 
       fetchAnalytics();
@@ -52,15 +64,24 @@ function Dashboard() {
 
       };
 
-   }, []);
+   }, [month, year]);
    const fetchAnalytics = async () => {
-
+      setLoading(true);
       try {
 
          const token = localStorage.getItem("token");
 
+         // const response = await API.get(
+         //    "/analytics",
+         //    {
+         //       headers: {
+         //          Authorization: `Bearer ${token}`
+         //       }
+         //    }
+         // );
+
          const response = await API.get(
-            "/analytics",
+            `/analytics?month=${month}&year=${year}`,
             {
                headers: {
                   Authorization: `Bearer ${token}`
@@ -130,7 +151,50 @@ function Dashboard() {
 
                </div>
 
+               <div className="date-filter-wrapper">
+
+                  <span className="date-filter-label">
+                     Viewing Period
+                  </span>
+
+                  <div className="date-filter">
+
+                     <select
+                        value={month}
+                        onChange={(e) =>
+                           setMonth(Number(e.target.value))
+                        }
+                     >
+                        <option value={1}>January</option>
+                        <option value={2}>February</option>
+                        <option value={3}>March</option>
+                        <option value={4}>April</option>
+                        <option value={5}>May</option>
+                        <option value={6}>June</option>
+                        <option value={7}>July</option>
+                        <option value={8}>August</option>
+                        <option value={9}>September</option>
+                        <option value={10}>October</option>
+                        <option value={11}>November</option>
+                        <option value={12}>December</option>
+                     </select>
+
+                     <select
+                        value={year}
+                        onChange={(e) =>
+                           setYear(Number(e.target.value))
+                        }
+                     >
+                        <option value={2025}>2025</option>
+                        <option value={2026}>2026</option>
+                     </select>
+
+                  </div>
+
+               </div>
+
             </div>
+
 
             {/* ADMIN BANNER */}
 
