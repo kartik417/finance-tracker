@@ -1,0 +1,324 @@
+/* ==========================================
+   AI INSIGHTS
+========================================== */
+
+.ai-insights {
+
+    position: sticky;
+    top: 90px;
+
+    height: calc(100vh - 120px);
+
+    overflow-y: auto;
+
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+
+    padding: 22px;
+
+    background: rgba(255,255,255,.05);
+    backdrop-filter: blur(18px);
+
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 24px;
+
+    box-shadow:
+        0 10px 40px rgba(0,0,0,.25);
+}
+
+/* ==========================================
+   HEADER
+========================================== */
+
+.insights-header{
+
+    border-bottom:1px solid rgba(255,255,255,.08);
+
+    padding-bottom:18px;
+}
+
+.insights-header h2{
+
+    color:white;
+
+    font-size:1.4rem;
+
+    margin-bottom:6px;
+}
+
+.insights-header p{
+
+    color:#94a3b8;
+
+    font-size:.9rem;
+}
+
+/* ==========================================
+   CARD
+========================================== */
+
+.insight-card{
+
+    background:rgba(255,255,255,.05);
+
+    border:1px solid rgba(255,255,255,.08);
+
+    border-radius:18px;
+
+    padding:18px;
+
+    transition:.3s;
+}
+
+.insight-card:hover{
+
+    border-color:#6366f1;
+
+    transform:translateY(-3px);
+}
+
+/* ==========================================
+   CARD HEADER
+========================================== */
+
+.card-header{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    margin-bottom:16px;
+
+    color:#818cf8;
+
+    font-weight:600;
+}
+
+.card-header svg{
+
+    font-size:18px;
+}
+
+/* ==========================================
+   BUDGET SCORE
+========================================== */
+
+.insight-card h2{
+
+    color:white;
+
+    font-size:2rem;
+
+    margin-bottom:15px;
+}
+
+.progress-bar{
+
+    width:100%;
+
+    height:10px;
+
+    border-radius:20px;
+
+    overflow:hidden;
+
+    background:rgba(255,255,255,.08);
+
+    margin-bottom:10px;
+}
+
+.progress-fill{
+
+    height:100%;
+
+    border-radius:20px;
+
+    background:linear-gradient(
+        90deg,
+        #6366f1,
+        #8b5cf6
+    );
+
+    transition:width .5s ease;
+}
+
+.insight-card small{
+
+    color:#94a3b8;
+}
+
+/* ==========================================
+   STATS
+========================================== */
+
+.stat-row{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:16px;
+
+    padding:14px 0;
+
+    border-bottom:1px solid rgba(255,255,255,.05);
+}
+
+.stat-row:last-child{
+
+    border-bottom:none;
+}
+
+.stat-row svg{
+
+    width:42px;
+
+    height:42px;
+
+    padding:10px;
+
+    border-radius:12px;
+
+    background:rgba(99,102,241,.12);
+
+    color:#818cf8;
+}
+
+.stat-row span{
+
+    color:#94a3b8;
+
+    font-size:.85rem;
+}
+
+.stat-row h3{
+
+    margin-top:4px;
+
+    color:white;
+
+    font-size:1.15rem;
+}
+
+/* ==========================================
+   AI TIPS
+========================================== */
+
+.tips-list{
+
+    list-style:none;
+
+    padding:0;
+
+    margin:0;
+}
+
+.tips-list li{
+
+    padding:12px 0;
+
+    color:#e2e8f0;
+
+    display:flex;
+
+    gap:10px;
+
+    align-items:flex-start;
+
+    border-bottom:1px solid rgba(255,255,255,.05);
+
+    line-height:1.6;
+}
+
+.tips-list li:last-child{
+
+    border-bottom:none;
+}
+
+.tips-list li::before{
+
+    content:"✓";
+
+    color:#22c55e;
+
+    font-weight:bold;
+
+    margin-top:2px;
+}
+
+/* ==========================================
+   TREND PLACEHOLDER
+========================================== */
+
+.trend-placeholder{
+
+    height:180px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+
+    align-items:center;
+
+    gap:12px;
+
+    border-radius:14px;
+
+    background:rgba(255,255,255,.03);
+
+    border:2px dashed rgba(255,255,255,.08);
+
+    color:#94a3b8;
+
+    text-align:center;
+}
+
+.trend-placeholder p{
+
+    font-size:.9rem;
+}
+
+/* ==========================================
+   LOADING
+========================================== */
+
+.insight-loading{
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    height:250px;
+
+    color:#94a3b8;
+
+    font-size:1rem;
+}
+
+/* ==========================================
+   SCROLLBAR
+========================================== */
+
+.ai-insights::-webkit-scrollbar{
+
+    width:6px;
+}
+
+.ai-insights::-webkit-scrollbar-thumb{
+
+    background:#475569;
+
+    border-radius:20px;
+}
+
+.ai-insights::-webkit-scrollbar-track{
+
+    background:transparent;
+}

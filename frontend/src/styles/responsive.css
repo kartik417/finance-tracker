@@ -1,0 +1,204 @@
+/* ==========================================
+   LARGE LAPTOPS (1400px and below)
+========================================== */
+
+@media (max-width: 1400px) {
+
+    .ai-dashboard {
+        grid-template-columns: 270px minmax(0, 1fr) 300px;
+        gap: 18px;
+    }
+
+    .stats-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+}
+
+/* ==========================================
+   LAPTOPS (1200px and below)
+========================================== */
+
+@media (max-width: 1200px) {
+
+    .ai-dashboard {
+
+        grid-template-columns: 260px 1fr;
+
+    }
+
+    .ai-insights {
+
+        display: none;
+
+    }
+
+}
+
+/* ==========================================
+   TABLETS
+========================================== */
+
+@media (max-width: 992px) {
+
+    .ai-dashboard {
+
+        grid-template-columns: 1fr;
+
+        padding: 18px;
+
+    }
+
+    .ai-sidebar {
+
+        position: relative;
+
+        top: 0;
+
+        height: auto;
+
+        max-height: 320px;
+
+    }
+
+    .stats-container {
+
+        grid-template-columns: repeat(2, 1fr);
+
+    }
+
+    .suggested-grid {
+
+        grid-template-columns: 1fr;
+
+    }
+
+}
+
+/* ==========================================
+   MOBILE
+========================================== */
+
+@media (max-width: 768px) {
+
+    .ai-dashboard {
+
+        padding: 14px;
+
+        gap: 18px;
+
+    }
+
+    .ai-header {
+
+        flex-direction: column;
+
+        text-align: center;
+
+        padding: 20px;
+
+    }
+
+    .ai-header-content h1 {
+
+        font-size: 1.5rem;
+
+    }
+
+    .stats-container {
+
+        grid-template-columns: 1fr;
+
+    }
+
+    .message-bubble {
+
+        max-width: 90%;
+
+    }
+
+    .chat-input-container {
+
+        flex-direction: column;
+
+        gap: 12px;
+
+    }
+
+    .send-button {
+
+        width: 100%;
+
+        height: 48px;
+
+        border-radius: 12px;
+
+    }
+
+    .new-chat-button {
+
+        width: calc(100% - 40px);
+
+        margin: 20px;
+
+    }
+
+}
+
+/* ==========================================
+   SMALL MOBILE
+========================================== */
+
+@media (max-width: 480px) {
+
+    .sidebar-header h2 {
+
+        font-size: 1.2rem;
+
+    }
+
+    .ai-header-icon {
+
+        width: 60px;
+
+        height: 60px;
+
+        font-size: 22px;
+
+    }
+
+    .conversation-item {
+
+        padding: 12px;
+
+    }
+
+    .message-avatar {
+
+        width: 40px;
+
+        height: 40px;
+
+    }
+
+    .message-bubble {
+
+        font-size: .9rem;
+
+        padding: 14px;
+
+    }
+
+    .stat-card {
+
+        padding: 18px;
+
+    }
+
+    .stat-value {
+
+        font-size: 1.3rem;
+
+    }
+
+}

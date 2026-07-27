@@ -1,9 +1,24 @@
-body{
-    margin: 0;
-    padding: 0;
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
 }
 
-.app-loader{
+html,
+body,
+#root {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    overflow-x: hidden;
+}
+
+/* body {
+    margin: 0;
+    padding: 0;
+} */
+
+.app-loader {
 
     min-height: 100vh;
 
@@ -16,22 +31,20 @@ body{
 
     gap: 18px;
 
-    background: linear-gradient(
-        135deg,
-        #4f46e5,
-        #7c3aed,
-        #9333ea
-    );
+    background: linear-gradient(135deg,
+            #4f46e5,
+            #7c3aed,
+            #9333ea);
 
     color: white;
 }
 
-.loader-ring{
+.loader-ring {
 
     width: 70px;
     height: 70px;
 
-    border: 6px solid rgba(255,255,255,0.2);
+    border: 6px solid rgba(255, 255, 255, 0.2);
 
     border-top: 6px solid white;
 
@@ -40,23 +53,23 @@ body{
     animation: spin 0.8s linear infinite;
 }
 
-.app-loader h2{
+.app-loader h2 {
 
     font-size: 32px;
 
     font-weight: 700;
 }
 
-.app-loader p{
+.app-loader p {
 
     opacity: 0.8;
 
     font-size: 16px;
 }
 
-@keyframes spin{
+@keyframes spin {
 
-    100%{
+    100% {
         transform: rotate(360deg);
     }
 }
